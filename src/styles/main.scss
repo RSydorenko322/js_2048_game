@@ -52,6 +52,7 @@ body {
     background-position: center;
 
     @include animation.bgc-image-appear(1.5s);
+
     @include mobile {
       background-position: 35% center;
     }
@@ -142,6 +143,7 @@ body {
   border-spacing: 10px;
   border-radius: $radius;
   box-shadow: $shadow-panel;
+
   // the command below is to avoid an unwanted bug while swaping game
   touch-action: none;
 
