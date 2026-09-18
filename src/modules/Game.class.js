@@ -164,6 +164,7 @@ class Game {
   canMerge() {
     const board = this.initialState;
 
+    // first check if there are same numbers IN ONE LINE
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 3; j++) {
         if (board[i][j] === board[i][j + 1]) {
@@ -172,6 +173,7 @@ class Game {
       }
     }
 
+    // second check if there are same numbers IN ONE COLUMN
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 4; j++) {
         if (board[i][j] === board[i + 1][j]) {
@@ -248,15 +250,18 @@ class Game {
     // set 2 by default
     this.initialState[rowIndex1][cellIndex1] = 2;
     this.initialState[rowIndex2][cellIndex2] = 2;
+
+    return [
+      [rowIndex1, cellIndex1],
+      [rowIndex2, cellIndex2],
+    ];
   }
 
   /**
    * Resets the game.
    */
   restart() {
-    this.initialState = structuredClone(Game.initState);
-    this.score = 0;
-    this.countSteps = 0;
+    return this.start();
   }
 
   getIndex() {
@@ -310,7 +315,7 @@ class Game {
 
     // 1. check if there are some free cells
     if (allEmptyCells.length === 0) {
-      return null;
+      return [];
     }
 
     // 1. find random element from the array of indexes
@@ -322,8 +327,9 @@ class Game {
 
     // 1. find appropriate element from initialState
     // 2. change it with 2/4 (depends on random)
-    // 3. add 2/4 as the third arguement to row/cell indexes to return
     this.initialState[row][cell] = randomValue;
+
+    return [[row, cell]];
   }
 }
 
