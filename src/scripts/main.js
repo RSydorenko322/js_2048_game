@@ -7,41 +7,81 @@ const game = new Game();
 window.game = game;
 
 // ALL FOUND DOM-ELEMENTS
+const allRows = document.querySelectorAll('.field-row');
 const startBtn = document.querySelector('.start');
+const scoreTracer = document.querySelector('.game-score');
+const messageStart = document.querySelector('.message-start');
+const messageLose = document.querySelector('.message-lose');
+const messageWin = document.querySelector('.message-win');
+const messagePlaying = document.querySelector('.message-playing');
 
 // ALL FUNCTION DECLARATIONS
-
-function handleStart() {
-  game.start();
-  renderBoard();
-}
-
-function renderBoard() {
-  // get currentState - 2D array
-  // start 2 nested forEach loops with indexes
-  // find all DOM-rows
-  // find all DOM-cells
-  // use indexes from the loops to find appropriate element from state var
-  // depending on if stateElement is equal to 0
-  // add textContent and class basing on the number of the state var
+function render() {
   const state = game.getState();
-  const allRows = document.querySelectorAll('.field-row');
 
-  allRows.forEach((rowEl, rowIndex) => {
-    const cells = rowEl.querySelectorAll('.field-cell');
+  allRows.forEach((row, rowIndex) => {
+    const cells = row.querySelectorAll('.field-cell');
 
     cells.forEach((cell, cellIndex) => {
       const stateElement = state[rowIndex][cellIndex];
 
+      cell.className = 'field-cell';
+
       if (stateElement !== 0) {
-        cell.className = `field-cell field-cell--${stateElement}`;
+        cell.classList.add(`field-cell--${stateElement}`);
         cell.textContent = stateElement;
       } else {
-        cell.className = 'field-cell';
         cell.textContent = '';
       }
     });
   });
+
+  scoreTracer.textContent = game.getScore();
+
+  if (game.getCountSteps() === 0) {
+    startBtn.className = 'button start';
+    startBtn.textContent = 'Start Game';
+  } else {
+    startBtn.className = 'button restart';
+    startBtn.textContent = 'Restart Game';
+  }
+
+  renderMessage();
+}
+
+function renderMessage() {
+  messageStart.classList.add('hidden');
+  messageLose.classList.add('hidden');
+  messageWin.classList.add('hidden');
+  messagePlaying.classList.add('hidden');
+
+  switch (game.getStatus()) {
+    case 'win':
+      messageWin.classList.remove('hidden');
+      break;
+    case 'lose':
+      messageLose.classList.remove('hidden');
+      break;
+    case 'idle':
+      messageStart.classList.remove('hidden');
+      break;
+    case 'playing':
+      messagePlaying.classList.remove('hidden');
+      break;
+
+    default:
+      break;
+  }
+}
+
+function handleStart() {
+  if (game.getStatus() === 'idle') {
+    game.start();
+  } else {
+    game.restart();
+  }
+
+  render();
 }
 
 // ALL EVENT LISTENERS
@@ -49,6 +89,10 @@ startBtn.addEventListener('click', handleStart);
 
 document.addEventListener('keydown', (e) => {
   if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+    return;
+  }
+
+  if (game.getStatus() !== 'playing') {
     return;
   }
 
@@ -75,6 +119,7 @@ document.addEventListener('keydown', (e) => {
 
   if (stateBefore !== stateAfter) {
     game.createNewCell();
-    renderBoard();
+    game.stepsIncrement();
+    render();
   }
 });

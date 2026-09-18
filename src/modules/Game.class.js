@@ -31,6 +31,8 @@ class Game {
   constructor(initialState = Game.initState) {
     // eslint-disable-next-line no-console
     this.initialState = structuredClone(initialState);
+    this.score = 0;
+    this.countSteps = 0;
   }
 
   moveLeft() {
@@ -41,9 +43,13 @@ class Game {
       const mergedCells = this.mergeCells(rowFiltered);
 
       // Adding zeros back to an array untill we have the original length
-      do {
+
+      // do {
+      //   mergedCells.push(0);
+      // } while (mergedCells.length < 4);
+      while (mergedCells.length < 4) {
         mergedCells.push(0);
-      } while (mergedCells.length < 4);
+      }
 
       return mergedCells;
     });
@@ -82,14 +88,14 @@ class Game {
     // For columns we itarate every cell and remove all zeros
     // Merge same 2 cells
     // Save the result in the variable processedColumns
-    const processedColumns = columns.map((row) => {
-      const rowFiltered = row.filter((cell) => cell !== 0);
-      const mergedCells = this.mergeCells(rowFiltered);
+    const processedColumns = columns.map((column) => {
+      const columnFiltered = column.filter((cell) => cell !== 0);
+      const mergedCells = this.mergeCells(columnFiltered);
 
       // add zeros untill having the original array`s length
-      do {
+      while (mergedCells.length < 4) {
         mergedCells.push(0);
-      } while (mergedCells.length < 4);
+      }
 
       return mergedCells;
     });
@@ -140,10 +146,42 @@ class Game {
     this.initialState = newRows;
   }
 
+  stepsIncrement() {
+    this.countSteps++;
+  }
+
+  getCountSteps() {
+    return this.countSteps;
+  }
+
   /**
    * @returns {number}
    */
-  getScore() {}
+  getScore() {
+    return this.score;
+  }
+
+  canMerge() {
+    const board = this.initialState;
+
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (board[i][j] === board[i][j + 1]) {
+          return true;
+        }
+      }
+    }
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 4; j++) {
+        if (board[i][j] === board[i + 1][j]) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 
   /**
    * @returns {number[][]}
@@ -165,13 +203,35 @@ class Game {
    * `win` - the game is won;
    * `lose` - the game is lost
    */
-  getStatus() {}
+
+  getStatus() {
+    const currentState = JSON.stringify(this.initialState);
+    const intState = JSON.stringify(Game.initState);
+    const hasWon = this.initialState.some((row) => row.includes(2048));
+    const boardHasEmptyCells = this.initialState.some((row) => row.includes(0));
+
+    if (currentState === intState) {
+      return 'idle';
+    }
+
+    if (hasWon) {
+      return 'win';
+    }
+
+    if (!boardHasEmptyCells && !this.canMerge()) {
+      return 'lose';
+    }
+
+    return 'playing';
+  }
 
   /**
    * Starts the game.
    */
   start() {
     // refresh initialState
+    this.score = 0;
+    this.countSteps = 0;
     this.initialState = structuredClone(Game.initState);
 
     const [rowIndex1, cellIndex1] = this.getIndex();
@@ -188,18 +248,16 @@ class Game {
     // set 2 by default
     this.initialState[rowIndex1][cellIndex1] = 2;
     this.initialState[rowIndex2][cellIndex2] = 2;
-
-    // return row-index, cell-index and value 2 to start start cells with
-    return [
-      [rowIndex1, cellIndex1, 2],
-      [rowIndex2, cellIndex2, 2],
-    ];
   }
 
   /**
    * Resets the game.
    */
-  restart() {}
+  restart() {
+    this.initialState = structuredClone(Game.initState);
+    this.score = 0;
+    this.countSteps = 0;
+  }
 
   getIndex() {
     // Getting 2 random indexes of row and cell to be appeared
@@ -217,8 +275,9 @@ class Game {
 
     for (let i = 0; i < row.length; i++) {
       if (row[i] === row[i + 1]) {
+        this.score += row[i] * 2;
         result.push(row[i] * 2);
-        i++;
+        i += 1;
       } else {
         result.push(row[i]);
       }
@@ -227,7 +286,7 @@ class Game {
     return result;
   }
 
-  getRandomValue() {
+  getTwoOrFour() {
     // random 2 or 4 cell
     const value = Math.random() > 0.9 ? 4 : 2;
 
@@ -239,7 +298,7 @@ class Game {
     // 2. check all the empty cells
     // 3. push indexes of all empty cells in the new array;
     const allEmptyCells = [];
-    const randomValue = this.getRandomValue();
+    const randomValue = this.getTwoOrFour();
 
     this.initialState.forEach((currentRow, indexRow) => {
       currentRow.forEach((currentCell, indexCell) => {
@@ -265,8 +324,6 @@ class Game {
     // 2. change it with 2/4 (depends on random)
     // 3. add 2/4 as the third arguement to row/cell indexes to return
     this.initialState[row][cell] = randomValue;
-
-    return [row, cell, randomValue];
   }
 }
 
