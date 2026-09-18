@@ -248,15 +248,18 @@ class Game {
     // set 2 by default
     this.initialState[rowIndex1][cellIndex1] = 2;
     this.initialState[rowIndex2][cellIndex2] = 2;
+
+    return [
+      [rowIndex1, cellIndex1],
+      [rowIndex2, cellIndex2],
+    ];
   }
 
   /**
    * Resets the game.
    */
   restart() {
-    this.initialState = structuredClone(Game.initState);
-    this.score = 0;
-    this.countSteps = 0;
+    this.start();
   }
 
   getIndex() {
@@ -324,6 +327,8 @@ class Game {
     // 2. change it with 2/4 (depends on random)
     // 3. add 2/4 as the third arguement to row/cell indexes to return
     this.initialState[row][cell] = randomValue;
+
+    return [[row, cell]];
   }
 }
 

@@ -16,7 +16,7 @@ const messageWin = document.querySelector('.message-win');
 const messagePlaying = document.querySelector('.message-playing');
 
 // ALL FUNCTION DECLARATIONS
-function render() {
+function render(newTiles = []) {
   const state = game.getState();
 
   allRows.forEach((row, rowIndex) => {
@@ -26,6 +26,18 @@ function render() {
       const stateElement = state[rowIndex][cellIndex];
 
       cell.className = 'field-cell';
+
+      if (newTiles && newTiles[0] === rowIndex && newTiles[1] === cellIndex) {
+        cell.classList.add('field-cell--new');
+      }
+
+      const isNew = newTiles.some(([r, c]) => {
+        return r === rowIndex && c === cellIndex;
+      });
+
+      if (isNew) {
+        cell.classList.add('field-cell--new');
+      }
 
       if (stateElement !== 0) {
         cell.classList.add(`field-cell--${stateElement}`);
@@ -75,13 +87,15 @@ function renderMessage() {
 }
 
 function handleStart() {
+  let newTiles = [];
+
   if (game.getStatus() === 'idle') {
-    game.start();
+    newTiles = game.start();
   } else {
     game.restart();
   }
 
-  render();
+  render(newTiles);
 }
 
 // ALL EVENT LISTENERS
@@ -118,8 +132,9 @@ document.addEventListener('keydown', (e) => {
   const stateAfter = JSON.stringify(game.getState());
 
   if (stateBefore !== stateAfter) {
-    game.createNewCell();
+    const newTile = game.createNewCell();
+
     game.stepsIncrement();
-    render();
+    render(newTile);
   }
 });
