@@ -37,10 +37,6 @@ body {
   overflow: hidden;
   position: relative;
 
-  @include mobile {
-    font-size: 18px;
-  }
-
   &::before {
     content: '';
     inset: 0;
@@ -70,12 +66,6 @@ body {
   user-select: none;
   box-shadow: $shadow-panel;
   text-shadow: 0 0 8px rgba(14, 15, 9, 0.5);
-
-  @include mobile {
-    width: 50px;
-    height: 50px;
-    font-size: 1em;
-  }
 
   &--new {
     @include animation.tile-appearance(0.5s);
@@ -146,10 +136,6 @@ body {
 
   // the command below is to avoid an unwanted bug while swaping game
   touch-action: none;
-
-  @include mobile {
-    border-spacing: 6px;
-  }
 }
 
 .game-header {
@@ -247,11 +233,6 @@ h1 {
   text-align: center;
   border-radius: 15px;
   font-size: 20px;
-
-  @include mobile {
-    font-size: 15px;
-    padding: 8px;
-  }
 }
 
 .hidden {
@@ -267,9 +248,7 @@ h1 {
   @include animation.table-appearance(2s);
 
   @include mobile {
-    width: 100%;
-    padding: 0 12px;
-    box-sizing: border-box;
+    width: 500px;
   }
 }
 
@@ -279,15 +258,5 @@ h1 {
 }
 
 .message-container {
-  width: 100%;
-}
-
-h1,
-.info,
-.button {
-  @include mobile {
-    width: 60px;
-    height: 60px;
-    font-size: 14px;
-  }
+  width: 80%;
 }
