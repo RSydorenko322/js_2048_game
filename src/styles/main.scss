@@ -37,6 +37,11 @@ body {
   overflow: hidden;
   position: relative;
 
+  @include mobile {
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+
   &::before {
     content: '';
     inset: 0;
@@ -248,7 +253,9 @@ h1 {
   @include animation.table-appearance(2s);
 
   @include mobile {
-    width: 500px;
+    width: 100%;
+    padding: 0 5px;
+    box-sizing: border-box;
   }
 }
 
